@@ -1,19 +1,17 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  ...
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>com.github.spotbugs</groupId>
-        <artifactId>spotbugs-maven-plugin</artifactId>
-        <version>4.2.1-SNAPSHOT</version>
-        <configuration>
-          <xmlOutput>true</xmlOutput>
-          <!-- Optional directory to put spotbugs xdoc xml report -->
-          <xmlOutputDirectory>target/site</xmlOutputDirectory>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
-  ...
-</project>
+node {
+    stage ('Checkout') {
+        checkout scm
+    }
+
+    stage ('Build and Static Analysis') {
+        sh 'mvn -V -e clean verify -Dmaven.test.failure.ignore'
+
+        recordIssues tools: [java(), javaDoc()], aggregatingResults: 'true', id: 'java', name: 'Java'
+        recordIssues tool: errorProne(), healthy: 1, unhealthy: 20
+        recordIssues tools: [checkStyle(pattern: 'target/checkstyle-result.xml'),
+            spotBugs(pattern: 'target/spotbugsXml.xml'),
+            pmdParser(pattern: 'target/pmd.xml'),
+            cpd(pattern: 'target/cpd.xml')],
+            qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]]
+    }
+}
