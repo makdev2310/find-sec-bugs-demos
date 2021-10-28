@@ -13,7 +13,7 @@
                 <threshold>Low</threshold>
                 <failOnError>true</failOnError>
                 <includeFilterFile>${session.executionRootDirectory}/spotbugs-security-include.xml</includeFilterFile>
-                <excludeFilterFile>${session.executionRootDirectory}/spotbugs.xml</excludeFilterFile>
+                <excludeFilterFile>${session.executionRootDirectory}/spotbugsXML.xml</excludeFilterFile>
                 <plugins>
                     <plugin>
                         <groupId>com.h3xstream.findsecbugs</groupId>
